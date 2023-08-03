@@ -7,17 +7,17 @@ import {
   selectShopping,
 } from "../reducers/shoppingListSlice";
 
-function AddAndEditModal({ isUnderEdit, setIsUnderEdit }) {
+function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey }) {
   // const shoppingList = useSelector(selectShopping);
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [brand, setBrand] = useState("");
-  const [category, setCategory] = useState("");
   const [isAddMore, setIsAddMore] = useState(false);
 
   const shoppingItem = {
+    id: name,
     name,
     quantity,
     brand,
@@ -30,10 +30,13 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit }) {
 
   const AddNewItem = (e) => {
     e.preventDefault();
-    dispatch(addItem(shoppingItem));
-    if (!isAddMore) {
-      toggleModal();
+    console.log(listKey);
+    dispatch(addItem([listKey,shoppingItem]));
+    if (isAddMore) {
+        return;
     }
+
+    toggleModal();
   };
 
   const handleEditItem = () => {};
@@ -75,7 +78,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit }) {
           </button>
           <div className="px-6 py-6 lg:px-8">
             <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Add New Item To Shopping List
+              Add New Item
             </h3>
             <form className="space-y-6" action="#">
               <div>
@@ -148,7 +151,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit }) {
                     <input
                       id="remember"
                       type="checkbox"
-                      value=""
+                      onChange={(e) => setIsAddMore(e.target.checked)}
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 "
                       required
                     />
