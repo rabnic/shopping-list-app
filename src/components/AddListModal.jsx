@@ -14,7 +14,6 @@ function AddListModal({ isUnderEdit: isAddList, setIsAddList }) {
   const [isAddMore, setIsAddMore] = useState(false);
 
   const shoppingList = {
-    id: listName,
     name: listName,
     items: [],
   };

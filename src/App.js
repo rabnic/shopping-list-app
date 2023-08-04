@@ -1,13 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { deleteItem } from "./reducers/shoppingListSlice";
+import { deleteItem, fetchDataAsync, deleteList } from "./reducers/shoppingListSlice";
 
 import "./App.css";
 import AddAndEditModal from "./components/AddItemModal";
 import AddListModal from "./components/AddListModal";
 
 import catBoxImage from "./assets/images/cat_in_the_box.png";
+import { collection, onSnapshot } from "@firebase/firestore";
+import { db } from "./firebaseConfig";
 
 const toggleListModal = () => {
   document.getElementById("add-list-modal").classList.toggle("hidden");
@@ -20,13 +22,49 @@ const toggleItemModal = () => {
 };
 
 function App() {
-  const shoppingList = useSelector((state) => state.shopping.value);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
+  // dispatch(fetchDataAsync());
+
+  const shoppingList = useSelector((state) => state.shopping.value);
   const [isUnderEdit, setIsUnderEdit] = useState(false);
   const [isAddList, setIsAddList] = useState(false);
   const [currentList, setCurrentList] = useState(null);
+  const [isChange, setIsChange] = useState(false);
   const selectedDivRef = useRef(null);
+
+  useEffect(() => {
+    // Fetch data from Firestore when the component mounts
+    // dispatch(fetchDataAsync());
+
+    // Set up Firestore subscription
+    // const collectionRef = collection(db, 'shoppingLists');
+    // const unsubscribe = onSnapshot(collectionRef, () => {
+    //   // Call the function when there are changes
+    //   console.log('There was a change');
+    // });
+    // console.log("ran")
+
+    dispatch(fetchDataAsync());
+    console.log("shoppingList", shoppingList);
+
+    // Clean up the subscription when the component unmounts or when you don't need it anymore
+    //  return () => {
+    //    unsubscribe();
+    //  };
+
+    //   const docRef = doc(db, 'shoppingLists', listKey);
+    // const unsubscribe = onSnapshot(docRef, (doc) => {
+    //   if (doc.exists()) {
+    //     const shoppingList = doc.data();
+    //     const items = shoppingList.items || [];
+
+    //     dispatch(setShoppingList(listKey, items));
+    //   }
+    // });
+
+
+  }, [dispatch, isChange]);
 
   const handleSetCurrentList = (e) => {
     const key = e.target.dataset.value;
@@ -50,6 +88,18 @@ function App() {
     }
   };
 
+  const handleDeleteList = () => {
+    const isDeleteConfirmed = window.confirm(
+      "Are you sure you want to delete this list?"
+    );
+    if (isDeleteConfirmed) {
+      setCurrentList(null)
+
+      dispatch(deleteList(currentList.id));
+      setIsChange(true)
+    }
+  }
+
   return (
     <main className="min-h-full w-full from-gray-900 to-gray-600 bg-gradient-to-r">
       <header className="container text-center mx-auto py-3 px-4 min-w-full shadow-md shadow-bottom shadow-yellow-600 flex justify-between text-yellow-500">
@@ -71,9 +121,9 @@ function App() {
           </svg>
           Shopping List
         </h1>
-        <p className="rounded-full w-16 h-16 font-semibold flex justify-center items-center bg-gray-500">
+        {/* <p className="rounded-full w-16 h-16 font-semibold flex justify-center items-center bg-gray-500">
           ND
-        </p>
+        </p> */}
       </header>
       <AddListModal isAddList={isAddList} setIsAddList={setIsAddList} />
       {currentList && (
@@ -171,7 +221,7 @@ function App() {
                     data-modal-target="add-item-modal"
                     data-modal-toggle="add-item-modal"
                     type="button"
-                    onClick={""}
+                    onClick={handleDeleteList}
                     className="flex gap-3 items-center justify-center w-fit-content text-white bg-red-400 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-8 py-4 ml-2 text-center"
                   >
                     <svg
@@ -198,7 +248,7 @@ function App() {
                       shoppingList[currentList.id].items.map((item) => {
                         return (
                           <>
-                            <tr className="h-16 border border-red-500 rounded-lg pr-4 text-gray-100 ">
+                            <tr key={item.id} className="h-16 border border-red-500 rounded-lg pr-4 text-gray-100 ">
                               <td>
                                 <div className="ml-5">
                                   <div className="bg-yellow-700 rounded-sm w-5 h-5 flex flex-shrink-0 justify-center items-center relative">
@@ -241,7 +291,7 @@ function App() {
                                   className="flex items-center"
                                   onClick={() => {
                                     setIsUnderEdit(true);
-                                    toggleListModal();
+                                    toggleItemModal()
                                   }}
                                 >
                                   <svg
@@ -259,7 +309,7 @@ function App() {
                               <td className="px-5">
                                 <button
                                   onClick={() =>
-                                    handleItemDelete(currentList?.id, item.id)
+                                    handleItemDelete(currentList?.id, item)
                                   }
                                   className="flex items-center"
                                 >

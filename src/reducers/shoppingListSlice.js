@@ -1,61 +1,106 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { db } from "../firebaseConfig";
 import {
-  collection,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  getDocs,
-  doc,
+    collection,
+    addDoc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    getDoc,
+    getDocs,
+    doc,
+    arrayUnion,
+    arrayRemove,
+    
 } from "firebase/firestore";
 
 const initialState = {
-  value: {},
+    value: {},
 };
 
+
+
 export const shoppingSlice = createSlice({
-  name: "shopping",
-  initialState,
-  reducers: {
-    addList: async (state, action) => {
-      //   state.value = { ...state.value, [action.payload.id]: action.payload };
-      const list = action.payload;
-      //   db.collection("shoppingLists").doc(list.id).set(list); // Save the list to Firestore
-      try {
-        console.log(list);
-        const docRef = await addDoc(collection(db, "shoppingLists"), list);
-        console.log("Doc written with ID:", docRef.id);
-      } catch (e) {
-        console.log(e.message);
-      }
-    },
-    addItem: (state, action) => {
-      const [listKey, item] = action.payload;
-      state.value = {
-        ...state.value,
-        [listKey]: {
-          ...state.value[listKey],
-          items: [...state.value[listKey].items, item],
+    name: "shopping",
+    initialState,
+    reducers: {
+        addList: async (state, action) => {
+            
+            const list = action.payload;
+            
+            try {
+                console.log(list);
+                const docRef = await addDoc(collection(db, "shoppingLists"), list);
+                console.log("Doc written with ID:", docRef.id);
+            } catch (e) {
+                console.log(e.message);
+            }
         },
-      };
-    },
-    deleteItem: (state, action) => {
-      const [listId, itemId] = action.payload;
-      state.value = {
-        ...state.value,
-        [listId]: {
-          ...state.value[listId],
-          items: state.value[listId].items.filter((item) => item.id !== itemId),
+
+        deleteList: async (state, action) => {
+            const docId = action.payload;
+            const docRef = await deleteDoc(doc(db, "shoppingLists", docId));
+            console.log(docRef, 'delete');
         },
-      };
+
+        addItem: async (state, action) => {
+            const [listKey, item] = action.payload;
+            try {
+                const docRef = doc(db, "shoppingLists", listKey);
+                updateDoc(docRef, { items: arrayUnion(item) });
+            } catch (e) {
+                console.log(e.message);
+            }
+        },
+
+        deleteItem: (state, action) => {
+            const [listId, item] = action.payload;
+            try {
+                const docRef = doc(db, "shoppingLists", listId);
+                updateDoc(docRef, { items: arrayRemove(item) });
+            } catch (e) {
+                console.log(e.message);
+            }
+        },
+        editItem: (state) => {
+
+        },
+        fetchData: (state) => {
+            // state.isLoading = true;
+            // state.isError = false;
+        },
+        fetchDataSuccess: (state, action) => {
+            state.isLoading = false;
+            state.isError = false;
+            state.value = action.payload;
+        },
+        fetchDataFailure: (state) => {
+            state.isLoading = false;
+            state.isError = true;
+        },
     },
-    editItem: (state) => {},
-  },
 });
 
-export const { addList, addItem, deleteItem, editItem } = shoppingSlice.actions;
+// Thunk to fetch data from Firestore
+export const fetchDataAsync = () => async (dispatch) => {
+    try {
+        dispatch(fetchData());
+        const shoppingListData = {};
+        const querySnapshot = await getDocs(collection(db, "shoppingLists"));
+        querySnapshot.docs.forEach(snapDoc => {
+            shoppingListData[snapDoc.id] = { id: snapDoc.id, ...snapDoc.data() }
+        }); 
+        console.log(shoppingListData);
+
+        dispatch(fetchDataSuccess(shoppingListData));
+        console.log('after data sucess');
+    } catch (error) {
+        dispatch(fetchDataFailure());
+    }
+};
+
+
+export const { addList, addItem, deleteItem, editItem, fetchData, fetchDataSuccess, fetchDataFailure, deleteList } = shoppingSlice.actions;
 
 export const selectShopping = (state) => state.shopping.value;
 
