@@ -31,9 +31,9 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey }) {
   const AddNewItem = (e) => {
     e.preventDefault();
     console.log(listKey);
-    dispatch(addItem([listKey,shoppingItem]));
+    dispatch(addItem([listKey, shoppingItem]));
     if (isAddMore) {
-        return;
+      return;
     }
 
     toggleModal();
@@ -170,7 +170,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey }) {
                   className="flex items-center justify-center gap-4 tracking-wider uppercase w-full text-white bg-gray-900 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   <svg
-                    class="w-6 h-6 text-yellow-600 dark:text-white"
+                    className="w-6 h-6 text-yellow-600 dark:text-white"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor"

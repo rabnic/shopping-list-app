@@ -1,36 +1,61 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { db } from "../firebaseConfig";
+import {
+  collection,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  doc,
+} from "firebase/firestore";
 
 const initialState = {
-    value: {},
-}
+  value: {},
+};
 
 export const shoppingSlice = createSlice({
-    name: 'shopping',
-    initialState,
-    reducers: {
-        addList: (state, action) => {
-            state.value = {...state.value, [action.payload.id]: action.payload}
-        },
-        addItem: (state, action) => {
-            const [listKey, item] = action.payload;
-            console.log(listKey);
-            console.log(item);
-            console.log(state.value);
-            // const updatedItems = state.value[listKey].items;
-            // updatedItems.push(item);
-
-            // state.value[listKey] = {...state.value[listKey], items: updatedItems}
-        },
-        deleteItem: (state) => {
-
-        },
-        editItem: (state) => {
-
-        },
+  name: "shopping",
+  initialState,
+  reducers: {
+    addList: async (state, action) => {
+      //   state.value = { ...state.value, [action.payload.id]: action.payload };
+      const list = action.payload;
+      //   db.collection("shoppingLists").doc(list.id).set(list); // Save the list to Firestore
+      try {
+        console.log(list);
+        const docRef = await addDoc(collection(db, "shoppingLists"), list);
+        console.log("Doc written with ID:", docRef.id);
+      } catch (e) {
+        console.log(e.message);
+      }
     },
+    addItem: (state, action) => {
+      const [listKey, item] = action.payload;
+      state.value = {
+        ...state.value,
+        [listKey]: {
+          ...state.value[listKey],
+          items: [...state.value[listKey].items, item],
+        },
+      };
+    },
+    deleteItem: (state, action) => {
+      const [listId, itemId] = action.payload;
+      state.value = {
+        ...state.value,
+        [listId]: {
+          ...state.value[listId],
+          items: state.value[listId].items.filter((item) => item.id !== itemId),
+        },
+      };
+    },
+    editItem: (state) => {},
+  },
 });
 
-export const {addList, addItem, deleteItem, editItem} = shoppingSlice.actions;
+export const { addList, addItem, deleteItem, editItem } = shoppingSlice.actions;
 
 export const selectShopping = (state) => state.shopping.value;
 
