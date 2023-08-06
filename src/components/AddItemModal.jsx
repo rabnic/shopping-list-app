@@ -7,9 +7,9 @@ import {
   selectShopping,
 } from "../reducers/shoppingListSlice";
 
-function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey }) {
+function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
   // const shoppingList = useSelector(selectShopping);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(0);
