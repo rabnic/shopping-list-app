@@ -12,59 +12,30 @@ import AddAndEditModal from "./components/AddItemModal";
 import AddListModal from "./components/AddListModal";
 
 import catBoxImage from "./assets/images/cat_in_the_box.png";
-import { collection, onSnapshot } from "@firebase/firestore";
-import { db } from "./firebaseConfig";
-
-const toggleListModal = () => {
-  document.getElementById("add-list-modal").classList.toggle("hidden");
-  document.getElementById("add-list-modal").classList.toggle("flex");
-};
-
-const toggleItemModal = () => {
-  document.getElementById("add-item-modal").classList.toggle("hidden");
-  document.getElementById("add-item-modal").classList.toggle("flex");
-};
 
 function App() {
   const dispatch = useDispatch();
-  // dispatch(fetchDataAsync());
 
   const shoppingList = useSelector((state) => state.shopping.value);
   const [isUnderEdit, setIsUnderEdit] = useState(false);
+  const [itemUnderEdit, setItemUnderEdit] = useState(null)
   const [isAddList, setIsAddList] = useState(false);
   const [currentList, setCurrentList] = useState(null);
   const selectedDivRef = useRef(null);
 
   useEffect(() => {
-    // Fetch data from Firestore when the component mounts
-    // dispatch(fetchDataAsync());
-
-    // Set up Firestore subscription
-    // const collectionRef = collection(db, 'shoppingLists');
-    // const unsubscribe = onSnapshot(collectionRef, () => {
-    //   // Call the function when there are changes
-    //   console.log('There was a change');
-    // });
-    // console.log("ran")
-
     dispatch(fetchDataAsync());
-    console.log("shoppingList", shoppingList);
-
-    // Clean up the subscription when the component unmounts or when you don't need it anymore
-    //  return () => {
-    //    unsubscribe();
-    //  };
-
-    //   const docRef = doc(db, 'shoppingLists', listKey);
-    // const unsubscribe = onSnapshot(docRef, (doc) => {
-    //   if (doc.exists()) {
-    //     const shoppingList = doc.data();
-    //     const items = shoppingList.items || [];
-
-    //     dispatch(setShoppingList(listKey, items));
-    //   }
-    // });
   }, [dispatch]);
+
+  const toggleListModal = () => {
+    document.getElementById("add-list-modal").classList.toggle("hidden");
+    document.getElementById("add-list-modal").classList.toggle("flex");
+  };
+
+  const toggleItemModal = () => {
+    document.getElementById("add-item-modal").classList.toggle("hidden");
+    document.getElementById("add-item-modal").classList.toggle("flex");
+  };
 
   const handleSetCurrentList = (e) => {
     const key = e.target.dataset.value;
@@ -131,6 +102,8 @@ function App() {
           setIsUnderEdit={setIsUnderEdit}
           listKey={currentList.id}
           dispatch={dispatch}
+          itemUnderEdit={itemUnderEdit}
+          setItemUnderEdit={setItemUnderEdit}
         />
       )}
 
@@ -246,89 +219,90 @@ function App() {
                     {currentList &&
                       shoppingList[currentList.id].items.map((item) => {
                         return (
-                          
-                            <tr
-                              key={item.id}
-                              className="h-16 mb-3 border border-red-500 rounded-lg pr-4 text-gray-100"
-                            >
-                              <td>
-                                <div className="ml-5">
-                                  <div className="bg-yellow-700 rounded-sm w-5 h-5 flex flex-shrink-0 justify-center items-center relative">
-                                    <input
-                                      type="checkbox"
-                                      className="checkbox opacity-50 absolute cursor-pointer w-full h-full"
-                                    />
-                                    {/* <div className="check-icon  bg-indigo-700 text-white rounded-sm">
+
+                          <tr
+                            key={item.id}
+                            className="h-16 mb-3 border border-red-500 rounded-lg pr-4 text-gray-100"
+                          >
+                            <td>
+                              <div className="ml-5">
+                                <div className="bg-yellow-700 rounded-sm w-5 h-5 flex flex-shrink-0 justify-center items-center relative">
+                                  <input
+                                    type="checkbox"
+                                    className="checkbox opacity-50 absolute cursor-pointer w-full h-full"
+                                  />
+                                  {/* <div className="check-icon  bg-indigo-700 text-white rounded-sm">
                                                         <svg className="icon icon-tabler icon-tabler-check" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                                             <path stroke="none" d="M0 0h24v24H0z" />
                                                             <path d="M5 12l5 5l10 -10" />
                                                         </svg>
                                                     </div> */}
-                                  </div>
                                 </div>
-                              </td>
-                              <td>
-                                <div className="flex items-center px-5">
-                                  <p className="text-base font-medium leading-none mr-2">
-                                    {item.name}
-                                  </p>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="flex items-center px-5">
-                                  <p className="text-base font-medium leading-none mr-2">
-                                    {item.brand}
-                                  </p>
-                                </div>
-                              </td>
-                              <td className="px-5">
-                                <div className="flex items-center">
-                                  <p className="text-sm leading-none ml-2">
-                                    {item.quantity}
-                                  </p>
-                                </div>
-                              </td>
-                              <td className="px-5">
-                                <button
-                                  className="flex items-center"
-                                  onClick={() => {
-                                    setIsUnderEdit(true);
-                                    toggleItemModal();
-                                  }}
+                              </div>
+                            </td>
+                            <td>
+                              <div className="flex items-center px-5">
+                                <p className="text-base font-medium leading-none mr-2">
+                                  {item.name}
+                                </p>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="flex items-center px-5">
+                                <p className="text-base font-medium leading-none mr-2">
+                                  {item.brand}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="px-5">
+                              <div className="flex items-center">
+                                <p className="text-sm leading-none ml-2">
+                                  {item.quantity}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="px-5">
+                              <button
+                                className="flex items-center"
+                                onClick={() => {
+                              setIsUnderEdit(true);
+                              toggleItemModal();
+                              setItemUnderEdit(item);
+                                }}
+                              >
+                                <svg
+                                  className="w-[28px] h-[28px] text-sky-400 dark:text-white"
+                                  aria-hidden="true"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 18"
                                 >
-                                  <svg
-                                    className="w-[28px] h-[28px] text-sky-400 dark:text-white"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 18"
-                                  >
-                                    <path d="M12.687 14.408a3.01 3.01 0 0 1-1.533.821l-3.566.713a3 3 0 0 1-3.53-3.53l.713-3.566a3.01 3.01 0 0 1 .821-1.533L10.905 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V11.1l-3.313 3.308Zm5.53-9.065.546-.546a2.518 2.518 0 0 0 0-3.56 2.576 2.576 0 0 0-3.559 0l-.547.547 3.56 3.56Z" />
-                                    <path d="M13.243 3.2 7.359 9.081a.5.5 0 0 0-.136.256L6.51 12.9a.5.5 0 0 0 .59.59l3.566-.713a.5.5 0 0 0 .255-.136L16.8 6.757 13.243 3.2Z" />
-                                  </svg>
-                                </button>
-                              </td>
-                              <td className="px-5">
-                                <button
-                                  onClick={() =>
-                                    handleItemDelete(currentList?.id, item)
-                                  }
-                                  className="flex items-center"
+                                  <path d="M12.687 14.408a3.01 3.01 0 0 1-1.533.821l-3.566.713a3 3 0 0 1-3.53-3.53l.713-3.566a3.01 3.01 0 0 1 .821-1.533L10.905 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V11.1l-3.313 3.308Zm5.53-9.065.546-.546a2.518 2.518 0 0 0 0-3.56 2.576 2.576 0 0 0-3.559 0l-.547.547 3.56 3.56Z" />
+                                  <path d="M13.243 3.2 7.359 9.081a.5.5 0 0 0-.136.256L6.51 12.9a.5.5 0 0 0 .59.59l3.566-.713a.5.5 0 0 0 .255-.136L16.8 6.757 13.243 3.2Z" />
+                                </svg>
+                              </button>
+                            </td>
+                            <td className="px-5">
+                              <button
+                                onClick={() =>
+                                  handleItemDelete(currentList?.id, item)
+                                }
+                                className="flex items-center"
+                              >
+                                <svg
+                                  className="w-[28px] h-[28px] text-red-400 dark:text-white"
+                                  aria-hidden="true"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                  viewBox="0 0 18 20"
                                 >
-                                  <svg
-                                    className="w-[28px] h-[28px] text-red-400 dark:text-white"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 18 20"
-                                  >
-                                    <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                  </svg>
-                                </button>
-                              </td>
-                            </tr>
-                           
-                          
+                                  <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+
+
                         );
                       })}
                   </tbody>

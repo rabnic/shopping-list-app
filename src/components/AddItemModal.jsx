@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -7,14 +7,26 @@ import {
   selectShopping,
 } from "../reducers/shoppingListSlice";
 
-function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
+function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemUnderEdit, setItemUnderEdit }) {
   // const shoppingList = useSelector(selectShopping);
   // const dispatch = useDispatch();
+  console.log(itemUnderEdit, 'underEdit');
+  console.log(isUnderEdit, 'isUnderEdit');
 
   const [name, setName] = useState("");
+  console.log('name', name);
   const [quantity, setQuantity] = useState(0);
   const [brand, setBrand] = useState("");
   const [isAddMore, setIsAddMore] = useState(false);
+
+  useEffect(() => {
+
+    if (itemUnderEdit) {
+      setName(itemUnderEdit.name);
+      setQuantity(itemUnderEdit.quantity);
+      setBrand(itemUnderEdit.brand);
+    }
+  }, [isUnderEdit])
 
   const shoppingItem = {
     id: name,
@@ -36,10 +48,25 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
       return;
     }
 
+    clearFields();
     toggleModal();
   };
 
-  const handleEditItem = () => {};
+  const handleEditItem = (e) => {
+    e.preventDefault();
+
+    dispatch(editItem([listKey, shoppingItem]));
+
+    clearFields();
+    toggleModal();
+  };
+
+  const clearFields = () => {
+    setName('');
+    setQuantity(0);
+    setBrand('');
+    setIsAddMore(false);
+  }
 
   return (
     <div
@@ -53,7 +80,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
           <button
             type="button"
             onClick={() => {
-              setIsUnderEdit(false);
+              setItemUnderEdit(null);
               toggleModal();
             }}
             className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -145,28 +172,29 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
                                     <option value="DE">Germany</option>
                                 </select>
                             </div> */}
-              <div className="flex justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="remember"
-                      type="checkbox"
-                      onChange={(e) => setIsAddMore(e.target.checked)}
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 "
-                      required
-                    />
+              {!itemUnderEdit &&
+                <div className="flex justify-between">
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="remember"
+                        type="checkbox"
+                        onChange={(e) => setIsAddMore(e.target.checked)}
+                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 "
+                        required
+                      />
+                    </div>
+                    <label
+                      htmlFor="remember"
+                      className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      Don't close modal after adding item?
+                    </label>
                   </div>
-                  <label
-                    htmlFor="remember"
-                    className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >
-                    Don't close modal after adding item?
-                  </label>
-                </div>
-              </div>
-              {isUnderEdit ? (
+                </div>}
+              {itemUnderEdit ? (
                 <button
-                  type="submit"
+                  onClick={handleEditItem}
                   className="flex items-center justify-center gap-4 tracking-wider uppercase w-full text-white bg-gray-900 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   <svg
@@ -183,7 +211,6 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch }) {
                 </button>
               ) : (
                 <button
-                  type="submit"
                   onClick={AddNewItem}
                   className="flex items-center justify-center gap-4 tracking-wider uppercase w-full text-white bg-gray-900 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >

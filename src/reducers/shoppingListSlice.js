@@ -46,6 +46,38 @@ export const addItem = createAsyncThunk(
   }
 );
 
+// Edit item in selected list
+export const editItem = createAsyncThunk(
+    "shopping/editItem",
+    async (listKeyAnditem) => {
+      const [listKey, item] = listKeyAnditem;
+      console.log(listKey, item);
+      try {
+        const docRef = doc(db, "shoppingLists", listKey);   
+      updateDoc(docRef, { items: arrayRemove(item) });
+
+        // const docSNap = await getDoc(docRef);
+        // if (docSNap.exists()){
+        //     const data = docSNap.data();
+        //     const items = data.items;
+        //     const idx = -1;
+        //     items.forEach((index, currItem) => {
+        //         if (currItem.id === item.id.id) {
+        //             idx = index;
+        //         }
+        //     })
+        //     items[idx] = item;
+        //    await updateDoc(docRef, { items: [] });
+        //    await updateDoc(docRef, { items: items });
+        // }
+      } catch (e) {
+        console.log(e.message);
+      }
+      return [listKey, item];
+    }
+  );
+
+
 // Delete item from selected list
 export const deleteItem = createAsyncThunk(
   "shopping/deleteItem",
@@ -87,58 +119,6 @@ export const shoppingSlice = createSlice({
   name: "shopping",
   initialState,
   reducers: {
-    // addList: async (state, action) => {
-
-    //     const list = action.payload;
-
-    //     try {
-    //         console.log(list);
-    //         const docRef = await addDoc(collection(db, "shoppingLists"), list);
-    //         console.log("Doc written with ID:", docRef.id);
-    //     } catch (e) {
-    //         console.log(e.message);
-    //     }
-    // },
-
-    // deleteList: async (state, action) => {
-    //   const docId = action.payload;
-    //   const docRef = await deleteDoc(doc(db, "shoppingLists", docId));
-    //   console.log(docRef, "delete");
-    // },
-
-    // addItem: async (state, action) => {
-    //   const [listKey, item] = action.payload;
-    //   try {
-    //     const docRef = doc(db, "shoppingLists", listKey);
-    //     updateDoc(docRef, { items: arrayUnion(item) });
-    //   } catch (e) {
-    //     console.log(e.message);
-    //   }
-    // },
-
-    // deleteItem: (state, action) => {
-    //   const [listId, item] = action.payload;
-    //   try {
-    //     const docRef = doc(db, "shoppingLists", listId);
-    //     updateDoc(docRef, { items: arrayRemove(item) });
-    //   } catch (e) {
-    //     console.log(e.message);
-    //   }
-    // },
-    editItem: (state) => {},
-    // fetchData: (state) => {
-    //   // state.isLoading = true;
-    //   // state.isError = false;
-    // },
-    // fetchDataSuccess: (state, action) => {
-    //   state.isLoading = false;
-    //   state.isError = false;
-    //   state.value = action.payload;
-    // },
-    // fetchDataFailure: (state) => {
-    //   state.isLoading = false;
-    //   state.isError = true;
-    // },
   },
   extraReducers: (builder) => {
     builder
@@ -169,11 +149,19 @@ export const shoppingSlice = createSlice({
           return currItem.name !== item.name && currItem.brand !== item.brand;
         });
         state.value = tempData;
+      })
+      .addCase(editItem.fulfilled, (state, action) => {
+        const [listKey, item] = action.payload;
+        const tempData = { ...state.value };
+        console.log(tempData[listKey]);
+        tempData[listKey].items.push(item);
+        console.log(item);
+        state.value = tempData;
       });
   },
 });
 
-export const { editItem } = shoppingSlice.actions;
+// export const { editItem } = shoppingSlice.actions;
 
 export const selectShopping = (state) => state.shopping.value;
 
