@@ -246,10 +246,10 @@ function App() {
                     {currentList &&
                       shoppingList[currentList.id].items.map((item) => {
                         return (
-                          <>
+                          
                             <tr
                               key={item.id}
-                              className="h-16 border border-red-500 rounded-lg pr-4 text-gray-100 "
+                              className="h-16 mb-3 border border-red-500 rounded-lg pr-4 text-gray-100"
                             >
                               <td>
                                 <div className="ml-5">
@@ -267,14 +267,14 @@ function App() {
                                   </div>
                                 </div>
                               </td>
-                              <td className>
+                              <td>
                                 <div className="flex items-center px-5">
                                   <p className="text-base font-medium leading-none mr-2">
                                     {item.name}
                                   </p>
                                 </div>
                               </td>
-                              <td className>
+                              <td>
                                 <div className="flex items-center px-5">
                                   <p className="text-base font-medium leading-none mr-2">
                                     {item.brand}
@@ -327,8 +327,8 @@ function App() {
                                 </button>
                               </td>
                             </tr>
-                            <tr className="h-3" />
-                          </>
+                           
+                          
                         );
                       })}
                   </tbody>
