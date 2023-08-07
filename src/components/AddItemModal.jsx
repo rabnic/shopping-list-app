@@ -7,29 +7,35 @@ import {
   selectShopping,
 } from "../reducers/shoppingListSlice";
 
-function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemUnderEdit, setItemUnderEdit }) {
+function AddAndEditModal({
+  isUnderEdit,
+  setIsUnderEdit,
+  listKey,
+  dispatch,
+  itemUnderEdit,
+  setItemUnderEdit,
+}) {
   // const shoppingList = useSelector(selectShopping);
   // const dispatch = useDispatch();
-  console.log(itemUnderEdit, 'underEdit');
-  console.log(isUnderEdit, 'isUnderEdit');
+  //console.log(itemUnderEdit, "underEdit");
+  //console.log(isUnderEdit, "isUnderEdit");
 
   const [name, setName] = useState("");
-  console.log('name', name);
+  //console.log("name", name);
   const [quantity, setQuantity] = useState(0);
   const [brand, setBrand] = useState("");
   const [isAddMore, setIsAddMore] = useState(false);
 
   useEffect(() => {
-
     if (itemUnderEdit) {
       setName(itemUnderEdit.name);
       setQuantity(itemUnderEdit.quantity);
       setBrand(itemUnderEdit.brand);
     }
-  }, [isUnderEdit])
+  }, [isUnderEdit, itemUnderEdit]);
 
   const shoppingItem = {
-    id: name,
+    id: itemUnderEdit ? itemUnderEdit.id : name,
     name,
     quantity,
     brand,
@@ -42,7 +48,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemU
 
   const AddNewItem = (e) => {
     e.preventDefault();
-    console.log(listKey);
+    //console.log(listKey);
     dispatch(addItem([listKey, shoppingItem]));
     if (isAddMore) {
       return;
@@ -56,17 +62,18 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemU
     e.preventDefault();
 
     dispatch(editItem([listKey, shoppingItem]));
-
+    setIsUnderEdit(false);
+    setItemUnderEdit(null);
     clearFields();
     toggleModal();
   };
 
   const clearFields = () => {
-    setName('');
+    setName("");
     setQuantity(0);
-    setBrand('');
+    setBrand("");
     setIsAddMore(false);
-  }
+  };
 
   return (
     <div
@@ -172,7 +179,7 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemU
                                     <option value="DE">Germany</option>
                                 </select>
                             </div> */}
-              {!itemUnderEdit &&
+              {!itemUnderEdit && (
                 <div className="flex justify-between">
                   <div className="flex items-start">
                     <div className="flex items-center h-5">
@@ -191,7 +198,8 @@ function AddAndEditModal({ isUnderEdit, setIsUnderEdit, listKey, dispatch, itemU
                       Don't close modal after adding item?
                     </label>
                   </div>
-                </div>}
+                </div>
+              )}
               {itemUnderEdit ? (
                 <button
                   onClick={handleEditItem}

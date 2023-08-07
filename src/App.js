@@ -18,7 +18,7 @@ function App() {
 
   const shoppingList = useSelector((state) => state.shopping.value);
   const [isUnderEdit, setIsUnderEdit] = useState(false);
-  const [itemUnderEdit, setItemUnderEdit] = useState(null)
+  const [itemUnderEdit, setItemUnderEdit] = useState(null);
   const [isAddList, setIsAddList] = useState(false);
   const [currentList, setCurrentList] = useState(null);
   const selectedDivRef = useRef(null);
@@ -54,7 +54,7 @@ function App() {
       "Are you sure you want to delete this item?"
     );
     if (isDeleteConfirmed) {
-      // console.log(listId, itemId, "Deleted");
+      // //console.log(listId, itemId, "Deleted");
       dispatch(deleteItem([listId, itemId]));
     }
   };
@@ -133,7 +133,7 @@ function App() {
             </svg>
             New List
           </button>
-          {console.log(shoppingList)}
+
           {shoppingList &&
             Object.keys(shoppingList).length > 0 &&
             Object.keys(shoppingList).map((key) => {
@@ -214,60 +214,55 @@ function App() {
 
             {currentList.items.length > 0 ? (
               <div className="mt-4 overflow-x-auto">
-                <table className="w-full whitespace-nowrap border-collapse">
+                <table className="w-full whitespace-nowrap border-collapse table-auto text-center">
+                  <thead>
+                    <tr className="bg-gray-300 text-gray-800 h-16 mb-3 rounded-lg pr-4 text-gray-100 w-full">
+                      <th className="px-5">Name</th>
+                      <th className="px-5 border-x border-gray-700">Brand</th>
+                      <th className="px-5 border-r border-gray-700">
+                        Quantity
+                      </th>
+                      <th colSpan={2} className="text-center px-5">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {currentList &&
                       shoppingList[currentList.id].items.map((item) => {
                         return (
-
                           <tr
                             key={item.id}
-                            className="h-16 mb-3 border border-red-500 rounded-lg pr-4 text-gray-100"
+                            className="h-16 mb-3 border-y rounded-lg pr-4 text-gray-100"
                           >
                             <td>
-                              <div className="ml-5">
-                                <div className="bg-yellow-700 rounded-sm w-5 h-5 flex flex-shrink-0 justify-center items-center relative">
-                                  <input
-                                    type="checkbox"
-                                    className="checkbox opacity-50 absolute cursor-pointer w-full h-full"
-                                  />
-                                  {/* <div className="check-icon  bg-indigo-700 text-white rounded-sm">
-                                                        <svg className="icon icon-tabler icon-tabler-check" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" />
-                                                            <path d="M5 12l5 5l10 -10" />
-                                                        </svg>
-                                                    </div> */}
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="flex items-center px-5">
+                              <div className="flex justify-center px-5">
                                 <p className="text-base font-medium leading-none mr-2">
                                   {item.name}
                                 </p>
                               </div>
                             </td>
                             <td>
-                              <div className="flex items-center px-5">
+                              <div className="flex justify-center px-5">
                                 <p className="text-base font-medium leading-none mr-2">
                                   {item.brand}
                                 </p>
                               </div>
                             </td>
                             <td className="px-5">
-                              <div className="flex items-center">
+                              <div className="flex justify-center">
                                 <p className="text-sm leading-none ml-2">
                                   {item.quantity}
                                 </p>
                               </div>
                             </td>
-                            <td className="px-5">
+                            <td className="px-5 justify-center items-center">
                               <button
-                                className="flex items-center"
+                                className=""
                                 onClick={() => {
-                              setIsUnderEdit(true);
-                              toggleItemModal();
-                              setItemUnderEdit(item);
+                                  setIsUnderEdit(true);
+                                  toggleItemModal();
+                                  setItemUnderEdit(item);
                                 }}
                               >
                                 <svg
@@ -282,12 +277,12 @@ function App() {
                                 </svg>
                               </button>
                             </td>
-                            <td className="px-5">
+                            <td className="px-5 justify-center items-center">
                               <button
                                 onClick={() =>
                                   handleItemDelete(currentList?.id, item)
                                 }
-                                className="flex items-center"
+                                className=""
                               >
                                 <svg
                                   className="w-[28px] h-[28px] text-red-400 dark:text-white"
@@ -301,8 +296,6 @@ function App() {
                               </button>
                             </td>
                           </tr>
-
-
                         );
                       })}
                   </tbody>
